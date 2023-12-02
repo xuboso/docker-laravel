@@ -1,0 +1,78 @@
+version: '3'
+services:
+
+    # Redis Service
+    redis:
+        image: 'redis:7.2'
+        container_name: redis
+        ports:
+            - "6379:6379"
+        command: redis-server --requirepass dk2v1TB%W|LfQS4_Cy6
+        networks:
+            - app-network
+
+    # PHP Service
+    app:
+        build:
+            context: docker/php
+            dockerfile: Dockerfile
+        # image: digitalocean.com/php
+        container_name: app
+        restart: unless-stopped
+        tty: true
+        volumes:
+            - ./:/var/www
+            - ./docker/php/php-ini-overrides.ini:/usr/local/etc/php/conf.d/local.ini
+            - ./docker/php/php-fpm.conf:/usr/local/etc/php-fpm.d/zz-docker.conf
+        environment:
+            SERVICE_NAME: app
+            SERVICE_TAGS: dev
+        working_dir: /var/www
+        networks:
+            - app-network
+
+    # Nginx Service
+    webserver:
+        image: nginx:1.25
+        container_name: webserver
+        restart: unless-stopped
+        tty: true
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            - app-network
+
+    # MySQL Service
+    db:
+        image: mysql:8.2.0
+        container_name: db
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "3306:3306"
+        volumes:
+            - dbdata:/var/lib/mysql
+            - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+        environment:
+            MYSQL_DATABASE: pay_credit
+            MYSQL_ROOT_PASSWORD: r!pzMi7-?>.C4PXzr50}
+            MYSQL_USER: docker_laravel
+            MYSQL_PASSWORD: dk2v1TB%W|LfQS4_Cy6
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        networks:
+            - app-network
+
+#Docker Networks
+networks:
+    app-network:
+        driver: bridge
+
+#Volumes
+volumes:
+    dbdata:
+        driver: local
