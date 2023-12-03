@@ -1,9 +1,5 @@
 # docker-compose相关
 
-### 参考
-
-[https://www.digitalocean.com/community/tutorials/how-to-set-up-laravel-nginx-and-mysql-with-docker-compose-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-set-up-laravel-nginx-and-mysql-with-docker-compose-on-ubuntu-20-04)
-
 ### 安装
 
 curl -SL https://github.com/docker/compose/releases/download/v2.23.1/docker-compose-linux-x86_64 -o docker-compose
@@ -17,6 +13,12 @@ docker-compose down -v
 1. 代码下载完后修改storage的权限 `chmod -R 777 storage/`
 2. 更新.env文件
 3. 执行 `docker-compose up -d`
+
+### 配置MySQL
+
+[https://gist.github.com/ksundong/7f695db1486d1ab28f854d3f0d1dcf66](https://gist.github.com/ksundong/7f695db1486d1ab28f854d3f0d1dcf66)
+
+[https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf](https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf)
 
 ### 权限问题
 
