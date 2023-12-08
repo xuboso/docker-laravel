@@ -1,66 +1,62 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## 说明
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### 部署
 
-## About Laravel
+1. 通过脚本安装docker
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+# 先执行dry-run查看是否可以安装
+sudo sh ./get-docker.sh --dry-run
+# 上一步没问题就执行
+sudo sh get-docker.sh
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+2. 安装docker-compose
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+curl -SL https://github.com/docker/compose/releases/download/v2.23.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+# 设置可执行权限
+sudo chmod +x /usr/local/bin/docker-compose
+# 查看是否安装成功
+docker-composer --version
+# 如果提示命令没找到需要更新环境变量
+```
 
-## Learning Laravel
+3. 修改项目配置.env文件
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+`cp .env.exmaple .env` 然后在.env里面编辑需要修改的项, 数据库配置和接口相关配置都在.env里面
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4. 修改docker-compose.yml文件
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+`docker-compose.yml`文件是各服务的配置，如redis和mysql的密码等, 如果这里修改了数据库的密码, 那么.env文件的相关项也需要修改
 
-## Laravel Sponsors
+5. 启动服务
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+在项目目录下执行`docker-compose up -d`命令来启动服务, 服务启动后修改storage文件夹的权限 `chmod -R 777 storage/`
 
-### Premium Partners
+6. 创建数据库
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+在.env文件修改完数据库和redis密码后，执行 `docker-compose exec app php artisan migrate`来创建数据库和表
 
-## Contributing
+7. 生成项目key
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+执行 `docker-compose exec app php artisan key:generate` 生成唯一key，用于加密等。
 
-## Code of Conduct
+8. 禁用调试模式
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+将.env文件的`APP_DEBUG=true`改为false，在生产环境禁用debug模式。
 
-## Security Vulnerabilities
+将`APP_ENV=local`设置为prod
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+9. 提升性能(可选)
 
-## License
+`docker-compose exec app php artisan config:cache`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+`docker-compose exec app php artisan route:cache`
+
+### docker配置说明 
+
+docker中的各种服务主要通过docker-compose.yml和dockerfile来配置。
+
+项目docker文件夹下包含各种服务的配置，php, mysql, nginx的相关配置都在这个文件夹下。如要修改nginx的配置，就在docker/nginx/conf.d/nginx.conf文件中，修改完成后需重启docker服务
