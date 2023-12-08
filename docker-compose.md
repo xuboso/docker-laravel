@@ -55,6 +55,8 @@ php-fpm.conf文件必须要全部覆盖掉zz-docker.conf，不能只添加部分
 
 https://medium.com/@lukaspereyra8/docker-compose-php-composer-the-missing-vendors-folder-issue-66faa5475c59
 
+[https://gist.github.com/andyshinn/e2c428f2cd234b718239](https://gist.github.com/andyshinn/e2c428f2cd234b718239)
+
 
 ### docker contaier不能执行ps命令
 

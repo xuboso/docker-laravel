@@ -31,6 +31,15 @@ services:
         networks:
             - app-network
 
+    # composer
+    composer:
+        restart: 'no'
+        image: composer:2.3
+        container_name: composer_app
+        command: composer install --no-interaction --optimize-autoloader
+        volumes:
+            - ./:/app
+
     # Nginx Service
     webserver:
         image: nginx:1.25
